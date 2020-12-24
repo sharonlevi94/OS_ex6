@@ -38,6 +38,9 @@ int main(int argc,char* argv[])
     char              buf[ARR_SIZE+1];
     int               random_arr[ARR_SIZE];
     int               rand_num;
+    int               count_numbers_received=0;
+    time_t            time_before,time_after,total_time;
+
 
     build_array(random_arr);
 
@@ -50,7 +53,7 @@ int main(int argc,char* argv[])
                           MY_PORT,
                           &con_kind,
                           &addr_info_res)) != 0) {
-       fprintf(stderr, "(getaddrinfo() failed %s\n", gai_strerror(rc)) ;
+       fprintf(stderr, "getaddrinfo() failed %s\n", gai_strerror(rc)) ;
        exit(EXIT_FAILURE) ;
     }
 
@@ -81,6 +84,7 @@ int main(int argc,char* argv[])
     FD_ZERO(&rfd);
     FD_SET(main_socket, &rfd);
 
+    time_before=time(NULL);
     while (nums_deleted<ARR_SIZE) {
         c_rfd = rfd;
 
@@ -105,8 +109,11 @@ int main(int argc,char* argv[])
         		}
         		else if(rc>0)
         		{
-        			if(find_location(random_arr,rand_num)!=-1) //rand_num is exist
+        			count_numbers_received++;
+        			if(find_location(random_arr,rand_num)!=-1){ //rand_num is exist
         				write(fd,YES,sizeof(int));
+        				nums_deleted++;
+        			}
         			else
         				write(fd,NO,sizeof(int));
         		}
@@ -116,6 +123,11 @@ int main(int argc,char* argv[])
         		}
         	}
     }
+
+    //missed: loop of send -1 to clients
+    time_after=time(NULL);
+    total_time=time_after-time_before;
+    printf("%d %d %d",total_time,count_numbers_received,nums_deleted);
     return(EXIT_SUCCESS) ;
 }
 //=========================================================================
