@@ -1,0 +1,99 @@
+//client program:
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>        // for memset
+#include <unistd.h>
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <netdb.h>
+#include <arpa/inet.h>
+#include <time.h>
+#include <sys/time.h>
+//========================================================================
+void terminate(char *);
+void catch_sigint(int sig_num);
+void print_prime_factors();
+//========================================================================
+struct addrinfo     *addr_info_res ;
+int                 my_socket;
+#define     		GCD_ACTION 'g'
+#define             PRIME_FACTORS_ACTION 'd'
+//========================================================================
+int main(int argc, char *argv[])
+{
+     if (argc < 3) { //need to be 5
+            fprintf(stderr, "Missing server name \n");
+            exit(EXIT_FAILURE) ;
+        }
+    int                 rc;            /* system calls return value storage */
+    char                wanted_action;
+    int                 n1 = 0, n2 = 0;
+    char                *input ;
+//    int                 answer = 0;
+    //int                 input_num;
+    struct addrinfo     con_kind;
+
+    memset(&con_kind, 0, sizeof(con_kind)) ;
+    con_kind.ai_family = AF_UNSPEC ;        // AF_INET, AF_INET6
+    con_kind.ai_socktype = SOCK_STREAM ;
+
+    if ((rc = getaddrinfo(argv[1], argv[2],/*server port number -argv[2]*/
+                                     &con_kind,
+                                     &addr_info_res) != 0)) {
+       fprintf(stderr, "(getaddrinfo() failed %s\n", gai_strerror(rc)) ;
+       exit(EXIT_FAILURE) ;
+    }
+    my_socket = socket(addr_info_res->ai_family,        // PF_INET
+                       addr_info_res->ai_socktype,      // SOCK_STREAM
+                       addr_info_res->ai_protocol);
+                                         // 0 = u decide which protocal to use
+    if (my_socket < 0)
+        terminate("socket: allocation failed");
+
+    rc = connect(my_socket,
+                 addr_info_res ->ai_addr,    // addr of server: IP+PORT
+                 addr_info_res ->ai_addrlen) ;
+    if (rc)
+        terminate("connect failed:");
+
+    //loop of send random numbers to server:
+    while(1){
+    	scanf("%c", &wanted_action);
+       // wanted_action = getchar();
+                getchar();
+                if(wanted_action == GCD_ACTION){
+                    scanf("%d",&n1);
+                    printf("%d\n",n1);
+                    scanf("%d",&n2);
+                    printf("%d\n",n2);
+                    sprintf(input,"%d %d",n1,n2);
+                    puts(input);
+                    //rc = write(my_socket,&input,strlen(input)+1);
+//                    printf("%d\n",answer); //print the result
+                }/*
+                else if(wanted_action==PRIME_FACTORS_ACTION){
+                    scanf("%d",&input_num);
+                    rc = write(my_socket,&input_num,sizeof(int));
+                    print_prime_factors();
+                }*/
+                getchar();
+    }
+    return EXIT_SUCCESS;
+}
+//========================================================================
+//this function terminate the program if there is an error in fork
+void terminate(char *error_message){
+    perror (error_message);
+    exit(EXIT_FAILURE);
+}
+//-------------------------------------------------------------------------
+void catch_sigint(int sig_num){
+	close(my_socket);
+	    freeaddrinfo(addr_info_res) ;
+	    exit(EXIT_SUCCESS);
+}
+//-------------------------------------------------------------------------
+void print_prime_factors(){
+
+}
