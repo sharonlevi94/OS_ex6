@@ -1,4 +1,3 @@
-//server program:
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>        // for memset
@@ -8,13 +7,16 @@
 #include <sys/socket.h>
 #include <netdb.h>
 #include <arpa/inet.h>
+#include <time.h>
+#include <sys/time.h>
 //========================================================================
-#define  MY_PORT   "17171"      // A String!
 #define  ARR_SIZE  10
 #define RAND_RANGE 10
-#define YES 1
-#define NO 0
+int YES =1;
+int NO =0;
 #define NUM_OF_CLIENTS 3
+#define NOT_EXIST -1
+int FINISH=-1;
 //========================================================================
 void build_array(int []);
 void terminate(char *);
@@ -36,10 +38,10 @@ int main(int argc,char* argv[])
     socklen_t her_addr_size;
     struct addrinfo con_kind,
                             *addr_info_res ;
-    char              buf[ARR_SIZE+1];
     int               random_arr[ARR_SIZE];
     int               rand_num;
     int               count_numbers_received=0;
+    int               location;
     time_t            time_before,time_after,total_time;
 
 
@@ -51,7 +53,7 @@ int main(int argc,char* argv[])
     con_kind.ai_flags = AI_PASSIVE ;        // system will fill my IP
 
     if ((rc = getaddrinfo(NULL,            // NULL = you set IP address
-                          MY_PORT,
+                          argv[1],
                           &con_kind,
                           &addr_info_res)) != 0) {
        fprintf(stderr, "getaddrinfo() failed %s\n", gai_strerror(rc)) ;
@@ -111,12 +113,13 @@ int main(int argc,char* argv[])
         		else if(rc>0)
         		{
         			count_numbers_received++;
-        			if(find_location(random_arr,rand_num)!=-1){ //rand_num is exist
-        				write(fd,YES,sizeof(int));
+        			if((location=find_location(random_arr,rand_num))!=NOT_EXIST){ //rand_num is exist
+        				write(fd,&YES,sizeof(int));
+        				delete_number(random_arr,location);
         				nums_deleted++;
         			}
         			else
-        				write(fd,NO,sizeof(int));
+        				write(fd,&NO,sizeof(int));
         		}
         		else {
         			perror("read() failes");
@@ -125,10 +128,11 @@ int main(int argc,char* argv[])
         	}
     }
 
-    //missed: loop of send -1 to clients
+    write(fd,&FINISH,sizeof(int));
     time_after=time(NULL);
     total_time=time_after-time_before;
-    printf("%d %d %d",total_time,count_numbers_received,nums_deleted);
+    sleep(1);
+    printf("%d %d %d\n",(int)total_time,count_numbers_received,nums_deleted);
     return(EXIT_SUCCESS) ;
 }
 //=========================================================================
@@ -152,7 +156,7 @@ int find_location(int arr[],int num){
         if(arr[i] == num)
             return i;
     }
-    return -1;
+    return NOT_EXIST;
 }
 //-------------------------------------------------------------------------
 void delete_number(int* arr, int location){
