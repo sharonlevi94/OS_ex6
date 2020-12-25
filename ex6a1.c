@@ -43,6 +43,8 @@ int main(int argc,char* argv[])
     int               count_numbers_received=0;
     int               location;
     time_t            time_before,time_after,total_time;
+    //int               client_counter=0;
+    int               i;
 
 
     build_array(random_arr);
@@ -86,7 +88,18 @@ int main(int argc,char* argv[])
 
     FD_ZERO(&rfd);
     FD_SET(main_socket, &rfd);
+/*
+while(client_counter<NUM_OF_CLIENTS){
+	rc=read(fd,&rand_num,sizeof(int));
+	if(rc>0)
+		client_counter++;
+}
 
+int i;
+for(i=0 ; i < NUM_OF_CLIENTS ; i++)
+	write(fd,&YES,sizeof(int));
+*/
+//sleep(3);
     time_before=time(NULL);
     while (nums_deleted<ARR_SIZE) {
         c_rfd = rfd;
@@ -127,8 +140,9 @@ int main(int argc,char* argv[])
         		}
         	}
     }
-
+for(i=0; i<NUM_OF_CLIENTS; i++){
     write(fd,&FINISH,sizeof(int));
+}
     time_after=time(NULL);
     total_time=time_after-time_before;
     sleep(1);
