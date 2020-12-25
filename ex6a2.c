@@ -1,3 +1,4 @@
+//client program:
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -11,6 +12,7 @@
 #define  NO  0
 #define  WANT_TO_CONNECT 2
 const int FINISH= -1;
+const int CAN_START =1;
 //========================================================================
 void terminate(char *);
 //========================================================================
@@ -57,9 +59,11 @@ int main(int argc, char *argv[])
         exit(EXIT_FAILURE) ;
     }
 
-
+/*
     //missed: send message to server and wait for feedback to start
     rc = write(my_socket,&atoi(argv[1]),sizeof(int));
+    while((rc=read(my_socket,&answer,sizeof(int))<=0)){}
+  */
     //loop of send random numbers to server:
     while(answer!=FINISH){
     	rand_num=rand()%10;
