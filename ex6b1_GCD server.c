@@ -12,6 +12,7 @@
 #include <arpa/inet.h>
 #include <time.h>
 #include <sys/time.h>
+#include <signal.h>
 //========================================================================
 int                fd; //closed in signal handler
 fd_set             rfd;
@@ -28,6 +29,7 @@ int main(int argc,char* argv[])
                 fprintf(stderr, "Missing port \n");
                 exit(EXIT_FAILURE) ;
             }
+    signal(SIGINT,catch_sigint);
     int                rc;                // return code
     int                main_socket;
     int                serving_socket;
