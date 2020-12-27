@@ -11,13 +11,14 @@
 #include <arpa/inet.h>
 #include <time.h>
 #include <sys/time.h>
+#include <signal.h>
 //========================================================================
 void terminate(char *);
-void catch_sigint(int sig_num, int );
+void catch_sigint(int sig_num);
 void connect_to_server(const char *, const char *, int *, int);
 //========================================================================
-struct addrinfo     *addr_info_res ;
-
+int                 gcd_socket, primary_factors_socket;
+struct addrinfo     *addr_info_res;
 //-------------------------------------------------------------------------
 
 #define             GCD_ACTION 'g'
@@ -30,12 +31,11 @@ int main(int argc, char *argv[]){
         fprintf(stderr, "Missing server name \n");
         exit(EXIT_FAILURE) ;
     }
-    int                 gcd_socket, primary_factors_socket;
+    signal(SIGINT,catch_sigint);
     int                 rca = 0, rcb = 0;  /* system calls return value storage */
     char                wanted_action;
     int                 n1 = 0, n2 = 0;
     char                input[MAX_MESSAGE_LEN] = {'\0'};
-    //    int                 answer = 0;
     int                 gcd;
     int                 primary_factros[MAX_MESSAGE_LEN];
     int i;
@@ -76,14 +76,15 @@ void terminate(char *error_message){
     exit(EXIT_FAILURE);
 }
 //-------------------------------------------------------------------------
-void catch_sigint(int sig_num, int my_socket){
-    close(my_socket);
-        freeaddrinfo(addr_info_res) ;
+void catch_sigint(int sig_num){
+    close(gcd_socket);
+    close(primary_factors_socket);
+    freeaddrinfo(addr_info_res) ;
         exit(EXIT_SUCCESS);
 }
 //-------------------------------------------------------------------------
 void connect_to_server(const char *IPaddress, const char *port_ID, int *mysocket, int rc){
-    struct addrinfo con_kind, *addr_info_res;
+    struct addrinfo con_kind;
     memset(&con_kind, 0, sizeof(con_kind)) ;
     con_kind.ai_family = AF_UNSPEC ;        // AF_INET, AF_INET6
     con_kind.ai_socktype = SOCK_STREAM ;
