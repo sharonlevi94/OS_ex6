@@ -23,28 +23,24 @@ void find_primary_factors(int , int []);
 //========================================================================
 int main(int argc,char* argv[])
 {
-    if (argc < 2) {
-        fprintf(stderr, "Missing port \n");
-        exit(EXIT_FAILURE) ;
-    }
+    if (argc < 2)
+        terminate("Missing port \n");
     int                rc;                // return code
     int                main_socket;
     int                serving_socket;
     int                num_to_prime_factor;
     int                prime_factors[MAX_LEN];
     fd_set             c_rfd;
-    
-    int i;
     struct sockaddr_storage her_addr;
     socklen_t her_addr_size;
     struct addrinfo con_kind,
     *addr_info_res ;
-    
+
     memset(&con_kind, 0, sizeof con_kind) ;
     con_kind.ai_family = AF_UNSPEC ;
     con_kind.ai_socktype = SOCK_STREAM ;
     con_kind.ai_flags = AI_PASSIVE ;        // system will fill my IP
-    
+
     if ((rc = getaddrinfo(NULL,            // NULL = you set IP address
                           argv[1],
                           &con_kind,
@@ -52,30 +48,24 @@ int main(int argc,char* argv[])
         fprintf(stderr, "getaddrinfo() failed %s\n", gai_strerror(rc)) ;
         exit(EXIT_FAILURE) ;
     }
-    
+
     main_socket = socket(addr_info_res -> ai_family,
                          addr_info_res -> ai_socktype,
                          addr_info_res -> ai_protocol);
-    if (main_socket < 0) {
-        perror("socket: allocation failed");
-        exit(EXIT_FAILURE) ;
-    }
-    
+    if (main_socket < 0)
+        terminate("socket: allocation failed");
+
     rc = bind(main_socket, addr_info_res-> ai_addr,
               addr_info_res-> ai_addrlen);
-    if (rc) {
-        perror("bind failed");
-        exit(EXIT_FAILURE) ;
-    }
-    
+    if (rc)
+       terminate("bind failed");
+
     rc = listen(main_socket, 3); //listen to clients
-    if (rc) {
-        perror("listen failed");
-        exit(EXIT_FAILURE) ;
-    }
-    
+    if (rc)
+       terminate("listen failed");
+
     her_addr_size = sizeof(her_addr);
-    
+
     FD_ZERO(&rfd);
     FD_SET(main_socket, &rfd);
     while (1) {
@@ -94,13 +84,9 @@ int main(int argc,char* argv[])
         for (fd = main_socket +1; fd < getdtablesize(); fd++)
         if(FD_ISSET(fd,&c_rfd)){
             rc = (int)read(fd, &num_to_prime_factor, MAX_LEN);
-            printf("received int: %d\n", num_to_prime_factor);
             find_primary_factors(num_to_prime_factor, prime_factors);
-            for (i = 0; i < MAX_LEN ; i++) {
-                printf("%d ", prime_factors[i]);
-            }
             rc = (int)write(fd ,&prime_factors, (sizeof(int) * MAX_LEN));
-            
+
         }
     }
     return(EXIT_SUCCESS) ;
