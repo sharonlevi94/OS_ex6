@@ -97,11 +97,8 @@ int main(int argc,char* argv[])
         for (fd=main_socket +1; fd < getdtablesize(); fd++)
             if(FD_ISSET(fd,&c_rfd)){
                 rc = (int)read(fd, &read_string, MAX_LEN);
-                printf("received string: ");
-                puts(read_string);
                 gcd_prospect1 = atoi(read_string);
                 gcd_prospect2 = get_num(read_string);
-                printf("nums are : 1. %d 2. %d\n", gcd_prospect1, gcd_prospect2);
                 gcd_to_return =find_gcd(gcd_prospect1, gcd_prospect2);
                 rc = (int)write(fd ,&gcd_to_return, sizeof(int));
             }
@@ -143,7 +140,3 @@ void catch_sigint(int sig_num){
      FD_CLR(fd,&rfd);
         exit(EXIT_SUCCESS);
 }
-
-//-------------------------------------------------------------------------
-
-//-------------------------------------------------------------------------
