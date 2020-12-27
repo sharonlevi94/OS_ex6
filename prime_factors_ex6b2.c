@@ -10,6 +10,7 @@
 #include <time.h>
 #include <sys/time.h>
 #include <stdbool.h>
+#include <signal.h>
 //========================================================================
 int                fd; //closed in signal handler
 fd_set             rfd;
@@ -25,6 +26,7 @@ int main(int argc,char* argv[])
 {
     if (argc < 2)
         terminate("Missing port \n");
+    signal(SIGINT,catch_sigint);
     int                rc;                // return code
     int                main_socket;
     int                serving_socket;
