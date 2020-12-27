@@ -97,3 +97,119 @@ void catch_sigint(int sig_num){
 void print_prime_factors(){
 
 }
+//!@!@!@!@!@!@!@!@!@!@!@!@!@!@!@
+//לא מחקתי את הקודם מפה בכוונה
+
+/client program:
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>        // for memset
+#include <unistd.h>
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <netdb.h>
+#include <arpa/inet.h>
+#include <time.h>
+#include <sys/time.h>
+//========================================================================
+void terminate(char *);
+void catch_sigint(int sig_num, int );
+void connect_to_server(const char *, const char *, int *, int);
+//========================================================================
+struct addrinfo     *addr_info_res ;
+
+//-------------------------------------------------------------------------
+
+#define             GCD_ACTION 'g'
+#define             PRIME_FACTORS_ACTION 'd'
+#define             MAX_MESSAGE_LEN 20
+//========================================================================
+int main(int argc, char *argv[]){
+    
+    if (argc < 3) { //need to be 5
+        fprintf(stderr, "Missing server name \n");
+        exit(EXIT_FAILURE) ;
+    }
+    int                 gcd_socket, primary_factors_socket;
+    int                 rca = 0, rcb = 0;            /* system calls return value storage */
+    char                wanted_action;
+    int                 n1 = 0, n2 = 0;
+    char                input[MAX_MESSAGE_LEN] = {'\0'};
+    //    int                 answer = 0;
+    int                 gcd;
+    int                 primary_factros[MAX_MESSAGE_LEN];
+    int i;
+    
+    connect_to_server(argv[1], argv[2], &gcd_socket, rca);
+    connect_to_server(argv[3], argv[4], &primary_factors_socket, rcb);
+    
+    while(1){
+        scanf("%c", &wanted_action);
+        getchar();
+        if(wanted_action == GCD_ACTION){
+            scanf("%d",&n1);
+            printf("%d\n",n1);
+            scanf("%d",&n2);
+            printf("%d\n",n2);
+            sprintf(input,"%d %d",n1,n2);
+            puts(input);
+            rca = (int)write(gcd_socket,&input,strlen(input)+1);
+            rca = (int)read(gcd_socket, &gcd, sizeof(int));
+            printf("gcd received is: %d\n", gcd);
+        }else if(wanted_action == PRIME_FACTORS_ACTION) {
+            scanf("%d",&n1);
+            printf("%d\n",n1);
+            rcb = (int)write(primary_factors_socket, &n1, sizeof(int));
+            rcb = (int)read(primary_factors_socket, &primary_factros, (sizeof(int) * MAX_MESSAGE_LEN));
+            for (i = 0; i <  MAX_MESSAGE_LEN && primary_factros[i] != -1; i++) {
+                printf("%d ", primary_factros[i]);
+            }
+            
+        }else {
+            puts("Invalid action. Please try again or press ctrl C to exit.");
+        }
+        getchar();
+    }
+    return EXIT_SUCCESS;
+}
+//========================================================================
+//this function terminate the program if there is an error in fork
+void terminate(char *error_message){
+    perror (error_message);
+    exit(EXIT_FAILURE);
+}
+//-------------------------------------------------------------------------
+void catch_sigint(int sig_num, int my_socket){
+    close(my_socket);
+        freeaddrinfo(addr_info_res) ;
+        exit(EXIT_SUCCESS);
+}
+//-------------------------------------------------------------------------
+void connect_to_server(const char *IPaddress, const char *port_ID, int *mysocket, int rc){
+    struct addrinfo con_kind, *addr_info_res;
+    memset(&con_kind, 0, sizeof(con_kind)) ;
+    con_kind.ai_family = AF_UNSPEC ;        // AF_INET, AF_INET6
+    con_kind.ai_socktype = SOCK_STREAM ;
+
+    if ((rc = getaddrinfo(IPaddress, port_ID ,/*server port number -argv[2]*/
+                                     &con_kind,
+                                     &addr_info_res) != 0)) {
+       fprintf(stderr, "(getaddrinfo() failed %s\n", gai_strerror(rc)) ;
+       exit(EXIT_FAILURE) ;
+    }
+    *mysocket = socket(addr_info_res->ai_family,        // PF_INET
+                       addr_info_res->ai_socktype,      // SOCK_STREAM
+                       addr_info_res->ai_protocol);
+                                         // 0 = u decide which protocal to use
+    if (mysocket < 0)
+        terminate("socket: allocation failed");
+
+    rc = connect(*mysocket,
+                 addr_info_res ->ai_addr,    // addr of server: IP+PORT
+                 addr_info_res ->ai_addrlen) ;
+    if (rc)
+        terminate("connect failed:");
+
+}
+//-------------------------------------------------------------------------
