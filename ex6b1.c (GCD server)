@@ -1,3 +1,5 @@
+
+//GCDserver program:
 //server program:
 #include <stdio.h>
 #include <stdlib.h>
@@ -17,14 +19,15 @@ fd_set             rfd;
 //========================================================================
 void terminate(char *);
 void catch_sigint(int sig_num);
+int get_num(char []);
 int find_gcd (int,int);
 //========================================================================
 int main(int argc,char* argv[])
 {
-	if (argc < 2) {
-		        fprintf(stderr, "Missing port \n");
-		        exit(EXIT_FAILURE) ;
-		    }
+    if (argc < 2) {
+                fprintf(stderr, "Missing port \n");
+                exit(EXIT_FAILURE) ;
+            }
     int                rc;                // return code
     int                main_socket;
     int                serving_socket;
@@ -34,9 +37,9 @@ int main(int argc,char* argv[])
     socklen_t her_addr_size;
     struct addrinfo con_kind,
                             *addr_info_res ;
-    //int               i;
-   // int 			  gcd;
-    char*             read_string;
+    int               gcd_prospect1, gcd_prospect2;
+    int               gcd_to_return;
+    char              read_string[20];
 
     memset(&con_kind, 0, sizeof con_kind) ;
     con_kind.ai_family = AF_UNSPEC ;
@@ -92,10 +95,16 @@ int main(int argc,char* argv[])
             }
         }
         for (fd=main_socket +1; fd < getdtablesize(); fd++)
-        	if(FD_ISSET(fd,&c_rfd)){
-        		//rc=read(fd,&read_string, MAX_LEN);
-        		//puts(read_string);
-        	}
+            if(FD_ISSET(fd,&c_rfd)){
+                rc = (int)read(fd, &read_string, MAX_LEN);
+                printf("received string: ");
+                puts(read_string);
+                gcd_prospect1 = atoi(read_string);
+                gcd_prospect2 = get_num(read_string);
+                printf("nums are : 1. %d 2. %d\n", gcd_prospect1, gcd_prospect2);
+                gcd_to_return =find_gcd(gcd_prospect1, gcd_prospect2);
+                rc = (int)write(fd ,&gcd_to_return, sizeof(int));
+            }
     }
     return(EXIT_SUCCESS) ;
 }
@@ -107,19 +116,34 @@ void terminate(char *error_message){
 }
 //-------------------------------------------------------------------------
 int find_gcd (int n1,int n2){
-	int gcd,i;
-	for(i=1; i <= n1 && i <= n2; ++i)
-	    {
-	      // Checks if i is factor of both integers
-	      if(n1%i==0 && n2%i==0){
-	         gcd = i;
-	      }
-	    }
-	return gcd;
+    int gcd = 0,i;
+    for(i=1; i <= n1 && i <= n2; ++i)
+        {
+          // Checks if i is factor of both integers
+          if(n1%i==0 && n2%i==0){
+             gcd = i;
+          }
+        }
+    return gcd;
+}
+//-------------------------------------------------------------------------
+int get_num(char make_int[]){
+    char *token;
+    char *search = " ";
+    int num_to_return;
+    // to point to second num in the string
+    token = strtok(make_int, search);
+    token = strtok(NULL, search);
+    num_to_return = atoi(token);
+    return num_to_return;
 }
 //-------------------------------------------------------------------------
 void catch_sigint(int sig_num){
-	close(fd);
-	 FD_CLR(fd,&rfd);
-	    exit(EXIT_SUCCESS);
+    close(fd);
+     FD_CLR(fd,&rfd);
+        exit(EXIT_SUCCESS);
 }
+
+//-------------------------------------------------------------------------
+
+//-------------------------------------------------------------------------
