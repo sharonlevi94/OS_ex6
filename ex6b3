@@ -27,7 +27,7 @@ struct addrinfo     *addr_info_res;
 //========================================================================
 int main(int argc, char *argv[]){
 
-    if (argc < 3) {
+    if (argc < 5) {
         fprintf(stderr, "Missing server name \n");
         exit(EXIT_FAILURE) ;
     }
