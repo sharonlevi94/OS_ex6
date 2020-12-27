@@ -39,7 +39,7 @@ int main(int argc,char* argv[])
                             *addr_info_res ;
     int               gcd_prospect1, gcd_prospect2;
     int               gcd_to_return;
-    char              read_string[20];
+    char              read_string[MAX_LEN];
 
     memset(&con_kind, 0, sizeof con_kind) ;
     con_kind.ai_family = AF_UNSPEC ;
