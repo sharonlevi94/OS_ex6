@@ -1,4 +1,10 @@
-//client program:
+ //ex6a2: client - number maker
+// this program is the number creator for ex5a1
+// here we create random numbers. the numbers are moved to ex6a1 via socket.
+// output will be- numbers sent, number deleted.
+  // race modes-
+// none that we are aware of.
+// output will be- 3 subprocesses data(as described), master time.
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
