@@ -38,7 +38,7 @@ Programs are executed via terminal. './<runFileName>.
  //when it read a number from the socket, it find all the prime factors of the
  //number it got, then it sent all the factors to the client.
  // the program will finish by ctrl+c in the terminal.
- //execute line (in terminal) : ./ex6b1 <PORT NUMBER2>
+ //execute line (in terminal) : ./ex6b2 <PORT NUMBER2>
  //input & output - None.
  
    //ex6b3 - client
@@ -50,6 +50,6 @@ Programs are executed via terminal. './<runFileName>.
  //input: 'g' and then two numbers.
  //input: 'd' and then one number.
  //execute line (in terminal) :
- //./ex6b1 <IP ADDRESS> <PORT NUMBER1>  <IP ADDRESS> <PORT NUMBER2>
+ //./ex6b3 <IP ADDRESS> <PORT NUMBER1>  <IP ADDRESS> <PORT NUMBER2>
  
 
