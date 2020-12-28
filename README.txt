@@ -8,8 +8,8 @@ ALL PROGRAMS ARE EXECUTED VIA UNIX TERMINAL ALL PROGRAMS COMPILED VIA TERMINAL-
 USING COMMAND "gcc -Wall (filename.cc) -o (runfilename) 
 Programs are executed via terminal. './<runFileName>.
 ********************************************************************************** 
-//ex5a
-  //ex5a1: server
+//ex6a
+  //ex6a1: server
 // this program creates the random numbers array and the socket.
 // after checking that we have 3 different number makers, we look for
 // numbers to delete. when receive a number, it checks if the number exists in the array.
@@ -17,9 +17,9 @@ Programs are executed via terminal. './<runFileName>.
 // when the array is all set to be -1, we finish .
 // the output will be- how much time it took.
 
-  //ex5a2: client - number maker
+  //ex6a2: client - number maker
 // this program is the number creator for ex5a1
-// here we create random numbers. the numbers are moved to ex5a1 via socket.
+// here we create random numbers. the numbers are moved to ex6a1 via socket.
 // output will be- numbers sent, number deleted.
   // race modes-
 // none that we are aware of.
