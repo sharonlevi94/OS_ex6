@@ -17,6 +17,7 @@
 int                fd; //closed in signal handler
 fd_set             rfd;
 #define            MAX_LEN 20
+#define            NUM_OF_CLIENTS 3
 //========================================================================
 void terminate(char *);
 void catch_sigint(int sig_num);
@@ -71,7 +72,7 @@ int main(int argc,char* argv[])
         exit(EXIT_FAILURE) ;
     }
 
-    rc = listen(main_socket, 3); //listen to clients
+    rc = listen(main_socket, NUM_OF_CLIENTS); //listen to clients
     if (rc) {
         perror("listen failed");
         exit(EXIT_FAILURE) ;
