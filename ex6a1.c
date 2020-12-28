@@ -1,3 +1,10 @@
+ //ex6a1: server
+// this program creates the random numbers array and the socket.
+// after checking that we have 3 different number makers, we look for
+// numbers to delete. when receive a number, it checks if the number exists in the array.
+// if so- it will bw deleted and replaced with '-1'. if not, continue;
+// when the array is all set to be -1, we finish .
+// the output will be- how much time it took.
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>        // for memset
